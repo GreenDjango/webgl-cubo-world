@@ -1,0 +1,33 @@
+{
+  "name": "cubo-world-web",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf dist/ && rm -rf /tmp/parcel_serve/",
+    "start": "yarn -s run serve",
+    "dev": "yarn -s run serve",
+    "serve": "parcel src/index.html --dist-dir /tmp/parcel_serve/",
+    "build": "yarn -s run clean && parcel build src/index.html --no-content-hash",
+    "build:prod": "yarn -s run clean && parcel build src/index.html --no-source-maps",
+    "clean:cache": "rm -rf .parcel-cache"
+  },
+  "devDependencies": {
+    "@parcel/transformer-image": "2.0.0-rc.0",
+    "@types/three": "^0.132.1",
+    "parcel": "^2.0.0-rc.0"
+  },
+  "dependencies": {
+    "three": "^0.132.2"
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "bracketSpacing": true,
+    "endOfLine": "lf",
+    "printWidth": 120,
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 4,
+    "trailingComma": "es5",
+    "useTabs": true
+  }
+}
