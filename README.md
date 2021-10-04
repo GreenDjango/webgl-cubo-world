@@ -14,12 +14,15 @@ Build create a `dist/` folder with a `index.html` entry.
 `npm i -g typescript`
 
 > Hot reload
+
 `yarn && yarn run serve`
 
 > Test build
+
 `yarn && yarn run build`
 
 > Production build
+
 `yarn && yarn run build:prod`
 
 ---
