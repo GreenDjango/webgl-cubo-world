@@ -13,7 +13,7 @@ Build create a `dist/` folder with a `index.html` entry.
 *Need tsc from Typescript for build*
 `npm i -g typescript`
 
-> Hot reload
+> Hot reload (localhost:1234)
 
 `yarn && yarn run serve`
 

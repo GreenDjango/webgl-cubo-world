@@ -3,18 +3,105 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Clients [Test]</title>
     <link rel="shortcut icon" type="image/png" href="icon.png" />
+    <meta name="description" content="Minecraft like game">
     <meta name="robots" content="noindex, nofollow">
     <meta name="googlebot" content="noindex, nofollow, noarchive">
+    <style>
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            margin: 0;
+            background: #111;
+            color: #eee;
+            font-family: Monospace, sans-serif;
+            overscroll-behavior: none;
+        }
+    </style>
     <link rel="stylesheet" href="style.css">
+    <link rel="preload" as="image" href="./assets/gui/minecraft-bee.webp">
+    <link rel="preload" as="image" href="./assets/gui/options-background.png">
 </head>
 
 <body>
-    <noscript>
-        Please enable JavaScript.
-    </noscript>
+    <div id="overlay-load">
+        <img src="./assets/gui/minecraft-bee.webp" alt="minecraft bee">
+        <div class="container-loading-bar">
+            <div id="loading-bar-1" class="loading-bar"></div>
+        </div>
+        <noscript>
+            <h1>Please enable JavaScript.</h1>
+        </noscript>
+    </div>
+    <div id="overlay-menu">
+        <div class="title">
+            <img class="pixel-render" src="./assets/gui/title.png" alt="minecraft logo">
+            <div class="title-sentence">Who say Minecraft?</div>
+        </div>
+        <div class="menu-btn pixel-render">
+            <button id="play-btn" class="pixel-btn"><span>Play</span></button>
+            <button id="options-btn" class="pixel-btn"><span>Options</span></button>
+            <button id="credits-btn" class="pixel-btn"><span>Credits</span></button>
+            <button id="github-btn" class="pixel-btn">
+                <a href="https://github.com/GreenDjango/webgl-cubo-world" target="_blank"
+                    rel="noopener noreferrer">Github</a>
+            </button>
+        </div>
+        <div class="bottom-sentence">Craft with <span class="emoji">☕</span> by Théo C.</div>
+    </div>
+    <div id="overlay-credits" class="pixel-render" style="display: none;">
+        <div class="title">Credits</div>
+        <div class="credits">By me</div>
+        <img src="./assets/gui/minecraft-bee.webp" alt="minecraft bee">
+        <button id="back-btn" class="pixel-btn"><span>Back</span></button>
+    </div>
+    <div id="overlay-options" class="pixel-render" style="display: none;">
+        <div class="title">Options</div>
+        <div class="menu-btn">
+            <div class="pixel-slider fov-slider">
+                <input class="slider-cursor" type="range" min="30" max="110" value="70">
+                <span class="slider-label">FOV: normal</span>
+                <input id="fov-slider" class="slider-controler" type="range" min="30" max="110" value="70">
+            </div>
+            <button id="tmp1-btn" disabled class="pixel-btn"><span>Test...</span></button>
+            <button id="tmp2-btn" class="pixel-btn"><span>Test...</span></button>
+            <button id="video-settings-btn" class="pixel-btn"><span>Video Settings...</span></button>
+            <button id="controls-btn" class="pixel-btn"><span>Controls...</span></button>
+            <button id="done-btn" class="pixel-btn"><span>Done</span></button>
+        </div>
+    </div>
+    <div id="overlay-pause" class="pixel-render" style="display: none;">
+        <div class="title">Game menu</div>
+        <div class="menu-btn">
+            <button id="resume-btn" class="pixel-btn"><span>Back to Game</span></button>
+            <button id="pause-options-btn" class="pixel-btn"><span>Options...</span></button>
+            <button id="tmp3-btn" class="pixel-btn"><span>Test...</span></button>
+            <button id="quit-btn" class="pixel-btn"><span>Quit to Title</span></button>
+        </div>
+    </div>
+    <div id="game" style="display: none;">
+        <header class="header-info">
+            <span>cubo world [fly controls]</span><br />
+            <b>ZQSD</b> move, <b>R|F</b> up | down, <b>A|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw
+        </header>
+        <img class="cursor pixel-render" src="./assets/gui/cursor.png" alt="game cursor">
+        <div class="slots pixel-render">
+            <div class="slot-select"></div>
+            <div id="slot1"></div>
+            <div id="slot2"></div>
+            <div id="slot3"></div>
+            <div id="slot4"></div>
+            <div id="slot5"></div>
+            <div id="slot6"></div>
+            <div id="slot7"></div>
+            <div id="slot8"></div>
+            <div id="slot9"></div>
+        </div>
+    </div>
     <script type="module" src="scripts/index.ts"></script>
 </body>
 

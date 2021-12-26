@@ -8,16 +8,16 @@
     "dev": "yarn -s run serve",
     "serve": "parcel src/index.html --dist-dir /tmp/parcel_serve/",
     "build": "yarn -s run clean && parcel build src/index.html --no-content-hash",
-    "build:prod": "yarn -s run clean && parcel build src/index.html --no-source-maps",
+    "build:prod": "yarn -s run clean && parcel build src/index.html --public-url \"/projects/cubo-world\" --no-source-maps",
     "clean:cache": "rm -rf .parcel-cache"
   },
   "devDependencies": {
-    "@parcel/transformer-image": "2.0.0-rc.0",
-    "@types/three": "^0.132.1",
-    "parcel": "^2.0.0-rc.0"
+    "@parcel/transformer-image": "2",
+    "@types/three": "0",
+    "parcel": "2"
   },
   "dependencies": {
-    "three": "^0.132.2"
+    "three": "0"
   },
   "prettier": {
     "arrowParens": "always",
