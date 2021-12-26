@@ -1,4 +1,4 @@
-import { Entity, Signature, SystemName } from './Types'
+import { Entity, SystemName } from './Types'
 
 export class System {
 	constructor() {}
@@ -10,10 +10,10 @@ export class SystemFactory {
 	constructor() {
 		this._systems = {}
 	}
-/*
+	/*
 	create(typeName: SystemName) {
 		// console.assert(this._registredComponentCount < MAX_COMPONENTS, 'Entity limit reached.')
-		console.assert(!(typeName in this._systems), 'System already registred.')
+		window.DEBUG && console.assert(!(typeName in this._systems), 'System already registred.')
 		std::shared_ptr<T> system = std::shared_ptr<T>(new T());
 		this._systems[typeName] = system;
 		return system;

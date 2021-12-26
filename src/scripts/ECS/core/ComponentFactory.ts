@@ -1,56 +1,60 @@
-import { Entity, ComponentType, ComponentName, MAX_COMPONENTS } from './Types'
+import { Entity, ComponentName, ComponentID, ComponentType, MAX_COMPONENTS, Type, Component } from './Types'
+import { EntityFactory } from './EntityFactory'
 
 export class ComponentFactory {
-	private _registredComponent: { [key: ComponentName]: number }
-	/*
-	_componentsMap: {
-		Sprite: {
-			1: {src:'e'},
-			2: {src:'b'}
-		}
-	}
-	*/
-	private _componentsMap: { [key: ComponentName]: { [key: Entity]: Object } }
+	private _registredComponent: { [key: ComponentID]: ComponentName }
 	private _currentCursor: number
+	private _entityFactoryRef: EntityFactory
 
-	constructor() {
+	constructor(entityFactoryRef: EntityFactory) {
 		this._registredComponent = {}
-		this._componentsMap = {}
 		this._currentCursor = 0
+		this._entityFactoryRef = entityFactoryRef
 	}
 
 	private get _registredComponentCount() {
 		return Object.keys(this._registredComponent).length
 	}
 
-	private _getComponentMap(typeName: ComponentName) {
-		console.assert(typeName in this._registredComponent, 'Component not registered.')
-		return this._componentsMap[typeName]
-	}
-
-	create(typeName: ComponentName) {
-		console.assert(this._registredComponentCount < MAX_COMPONENTS, 'Entity limit reached.')
-		console.assert(!(typeName in this._registredComponent), 'Component already registred.')
-		while (Object.values(this._registredComponent).some((a) => a === this._currentCursor)) {
+	create(componentClass: Type<Component>) {
+		const componentName = componentClass.name
+		window.DEBUG && console.assert(this._registredComponentCount < MAX_COMPONENTS, 'Entity limit reached.')
+		window.DEBUG &&
+			console.assert(
+				Object.values(this._registredComponent).every((s) => s !== componentName),
+				'Component already registred.'
+			)
+		do {
 			this._currentCursor++
-			if (this._currentCursor >= MAX_COMPONENTS) this._currentCursor = 0
-		}
-		this._registredComponent[typeName] = this._currentCursor
-		this._componentsMap[typeName] = {}
+			if (this._currentCursor >= Number.MAX_SAFE_INTEGER) {
+				this._currentCursor = 1
+			}
+		} while (this._registredComponent[this._currentCursor] !== undefined)
+
+		this._registredComponent[this._currentCursor] = componentName
+		;(<any>componentClass).type = this._currentCursor
 	}
 
-	exist(typeName: ComponentName): boolean
-	exist(entity: Entity, typeName: ComponentName): boolean
-	exist(entityOrTypeName: Entity | ComponentName, typeName?: ComponentName) {
-		if (typeName !== undefined) {
-			return entityOrTypeName in this._getComponentMap(typeName)
-		} else {
-			return entityOrTypeName in this._registredComponent
+	exist(componentClass: Type<Component>): boolean
+	exist(typeName: ComponentID): boolean
+	exist(typeOrComponent: ComponentID | Type<Component>) {
+		if (typeof typeOrComponent === 'number') {
+			return this._registredComponent[typeOrComponent] !== undefined
 		}
+		return Object.values(this._registredComponent).some((s) => s === typeOrComponent.name)
 	}
 
+	assign<T extends ComponentType>(entity: Entity, component: T) {
+		const components = this._entityFactoryRef.get(entity)
+		const typeID: number = (<any>component.constructor).type
+		window.DEBUG && console.assert(typeof typeID === 'number', 'Component not registered.')
+		components[typeID] = component
+		return component
+	}
+
+	/*
 	getType(typeName: ComponentName): ComponentType {
-		console.assert(typeName in this._registredComponent, 'Component not registered.')
+		window.DEBUG && console.assert(typeName in this._registredComponent, 'Component not registered.')
 		return 0b1 << this._registredComponent[typeName]
 	}
 
@@ -60,7 +64,7 @@ export class ComponentFactory {
 
 	unassign(entity: Entity, typeName: ComponentName) {
 		const componentMap = this._getComponentMap(typeName)
-		console.assert(entity in componentMap, "Entity doesn't have this component.")
+		window.DEBUG && console.assert(entity in componentMap, "Entity doesn't have this component.")
 		if (entity in componentMap) {
 			delete componentMap[entity]
 		}
@@ -68,7 +72,7 @@ export class ComponentFactory {
 
 	get(entity: Entity, typeName: ComponentName) {
 		const componentMap = this._getComponentMap(typeName)
-		console.assert(entity in componentMap, "Entity doesn't have this component.")
+		window.DEBUG && console.assert(entity in componentMap, "Entity doesn't have this component.")
 		return componentMap[entity]
 	}
 
@@ -77,4 +81,5 @@ export class ComponentFactory {
 			this.unassign(entity, typeName)
 		}
 	}
+	*/
 }

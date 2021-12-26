@@ -1,91 +1,119 @@
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { doBenchmark } from './benchmark'
-import { Coordinator, Sprite, Position } from './ECS'
+// import { doBenchmark } from './benchmark'
+// return setTimeout(doBenchmark, 100)
 
-const DEBUG = true
+import { Game } from './game'
+import { getByClass, getById } from './utils'
 
-if (DEBUG) {
-	const defaultAssert = console.assert
-	console.assert = (value: any, ...optionalParams: any[]) => {
-		// if (!value) alert('assert fail')
-		defaultAssert(value, ...optionalParams)
+// --- GLOBAL
+declare global {
+	interface Window {
+		DEBUG: boolean
+		CONFIG: {
+			renderDistance: 0 | 1 | 2 | 3 // 1x1 | 3x3 | 5x5 | 7x7 chunks (x*2+1)²
+			fov: number // Camera frustum vertical field of view
+			tick: 25 | 50 | 100 | 200 // 40 | 20 | 10 | 5 tick/s
+		}
 	}
-} else {
-	console.assert = () => {}
 }
 
-// setTimeout(doBenchmark, 1000)
-
-const ecs = new Coordinator()
-
-ecs.registerComponent(Position.name)
-ecs.registerComponent(Sprite.name)
-ecs.registerComponent('a')
-ecs.registerComponent('b')
-ecs.registerComponent('c')
-ecs.registerComponent('d')
-ecs.registerComponent('e')
-
-console.time('entity')
-for (let index = 0; index < 16 * 16 * 128; index++) {
-	const entity = ecs.createEntity()
-	ecs.assignComponent(entity, new Position())
+window.DEBUG = true
+window.CONFIG = {
+	renderDistance: 3,
+	fov: 75,
+	tick: 200,
 }
-console.timeEnd('entity')
 
-ecs.assignComponent(1, new Sprite())
-ecs.assignComponent(2, new Sprite())
-ecs.assignComponent(3, new Sprite())
+async function main() {
+	const loadHTML = getById('overlay-load') 
+	const menuHTML = getById('overlay-menu')
+	const optionsHTML = getById('overlay-options')
+	const creditsHTML = getById('overlay-credits')
+	const pauseHTML = getById('overlay-pause')
+	const gameHTML = getById('game')
+	const loadingBarHTML = getById('loading-bar-1')
 
-console.log(ecs)
+	const game = new Game(gameHTML)
 
-setInterval(()=> {
-	// system
-}, 50) // 20 tick/s
+	setTimeout(async () => {
+		await game.init(loadingBarHTML)
+		await new Promise((r) => setTimeout(r, 600))
+		loadHTML.style.display = 'none'
+		menuHTML.style.display = ''
+	}, 50)
 
-/*
-const scene = new THREE.Scene()
+	document.onkeydown = (ev: KeyboardEvent) => {
+		if (!game.isRun && !game.isPause) return
+		if (game.isRun) {
+			if (ev.key === 'Escape') {
+				game.pause()
+				pauseHTML.style.display = ''
+			}
+		} else if (game.isPause) {
+			if (ev.key === 'Escape') {
+				game.resume()
+				pauseHTML.style.display = 'none'
+			}
+		}
+	}
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-camera.position.z = 2
+	getById<HTMLButtonElement>('play-btn').onclick = (ev: MouseEvent) => {
+		ev.stopPropagation()
+		gameHTML.style.display = ''
+		menuHTML.style.display = 'none'
+		pauseHTML.style.display = 'none'
+		game.run()
+	}
 
-const renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
+	getById<HTMLButtonElement>('options-btn').onclick = (ev: MouseEvent) => {
+		ev.stopPropagation()
+		optionsHTML.style.display = ''
+		menuHTML.style.display = 'none'
+	}
 
-const controls = new OrbitControls(camera, renderer.domElement)
+	getById<HTMLButtonElement>('credits-btn').onclick = (ev: MouseEvent) => {
+		ev.stopPropagation()
+		creditsHTML.style.display = ''
+		menuHTML.style.display = 'none'
+	}
 
-const geometry = new THREE.BoxGeometry()
-const material = new THREE.MeshBasicMaterial({
-	color: 0x00ff00,
-	wireframe: true,
+	getById<HTMLButtonElement>('back-btn').onclick = (ev: MouseEvent) => {
+		ev.stopPropagation()
+		menuHTML.style.display = ''
+		creditsHTML.style.display = 'none'
+	}
+
+	getById<HTMLInputElement>('fov-slider').oninput = function (ev: Event) {
+		ev.stopPropagation()
+		const input = this as HTMLInputElement
+		const inputCursor = getByClass('slider-cursor', input.parentElement)[0] as HTMLInputElement
+		inputCursor.value = input.value
+		const inputLabel = getByClass('slider-label', input.parentElement)[0] as HTMLSpanElement
+		inputLabel.innerText = `FOV: ${input.value === '70' ? 'normal' : input.value}`
+		console.log(input.valueAsNumber)
+	}
+
+	getById<HTMLButtonElement>('done-btn').onclick = (ev: MouseEvent) => {
+		ev.stopPropagation()
+		menuHTML.style.display = ''
+		optionsHTML.style.display = 'none'
+	}
+
+	getById<HTMLButtonElement>('resume-btn').onclick = (ev: MouseEvent) => {
+		ev.stopPropagation()
+		game.resume()
+		pauseHTML.style.display = 'none'
+	}
+
+	getById<HTMLButtonElement>('quit-btn').onclick = (ev: MouseEvent) => {
+		ev.stopPropagation()
+		game.stop()
+		menuHTML.style.display = ''
+		pauseHTML.style.display = 'none'
+		gameHTML.style.display = 'none'
+	}
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+	window.DEBUG && console.log('DOMContentLoaded')
+	main()
 })
-
-const cube = new THREE.Mesh(geometry, material)
-scene.add(cube)
-
-window.addEventListener('resize', onWindowResize, false)
-function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight
-	camera.updateProjectionMatrix()
-	renderer.setSize(window.innerWidth, window.innerHeight)
-	render()
-}
-
-function animate() {
-	requestAnimationFrame(animate)
-
-	cube.rotation.x += 0.01
-	cube.rotation.y += 0.01
-
-	controls.update()
-
-	render()
-}
-
-function render() {
-	renderer.render(scene, camera)
-}
-animate()
-*/

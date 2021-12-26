@@ -1,17 +1,7 @@
-import { EntityFactory, writeSignature } from './EntityFactory'
+import { EntityFactory } from './EntityFactory'
 import { ComponentFactory } from './ComponentFactory'
 import { SystemFactory } from './SystemFactory'
-import { Entity, ComponentName } from './Types'
-
-/*
-  ├── EntityFactory
-  │   ├── Entities
-  │   └── Signatures
-  ├── ComponentFactory
-  │   ├── ???
-  │   └── ???
-  └── SystemFactory
-*/
+import { Entity, ComponentType, Type, Component } from './Types'
 
 export class Coordinator {
 	private _entityFactory: EntityFactory
@@ -20,7 +10,7 @@ export class Coordinator {
 
 	constructor() {
 		this._entityFactory = new EntityFactory()
-		this._componentFactory = new ComponentFactory()
+		this._componentFactory = new ComponentFactory(this._entityFactory)
 		this._systemFactory = new SystemFactory()
 	}
 
@@ -30,35 +20,30 @@ export class Coordinator {
 
 	destroyEntity(entity: Entity) {
 		this._entityFactory.destroy(entity)
-		this._componentFactory.onEntityDestroy(entity)
+		// this._componentFactory.onEntityDestroy(entity)
 		// this._systemFactory.onEntityDestroy(entity);
 	}
 
-	registerComponent(typeName: ComponentName, checkIfExist = false) {
-		if (!checkIfExist || !this._componentFactory.exist(typeName)) {
-			this._componentFactory.create(typeName)
+	registerComponent(componentClass: Type<Component>, checkIfExist = false) {
+		window.DEBUG && console.log('Register component:', componentClass.name)
+		if (!checkIfExist || !this._componentFactory.exist(componentClass)) {
+			this._componentFactory.create(componentClass)
 		}
 	}
 
-	// Variadic arg
-	// template <typename First, typename... Args>
-	// void assigns(ecs::Entity entity, First first, Args... args) {
-	//     assigns(entity, first);
-	//     assigns(entity, args...);
-	// }
-	// template <typename Args>
-	// void assigns(ecs::Entity entity, Args args) {
-	//     assignComponent<Args>(entity, args);
-	// }
-	// --
-
-	assignComponent(entity: Entity, component: Object) {
+	assignComponent<T extends ComponentType>(entity: Entity, component: T) {
 		this._componentFactory.assign(entity, component)
-		const actualSignature = this._entityFactory.getSignature(entity)
-		const newSignature = writeSignature(actualSignature, this._componentFactory.getType(component.constructor.name))
-		this._entityFactory.setSignature(entity, newSignature)
 		// _systemFactory->entitySignatureChanged(entity, actual);
-		return this._componentFactory.get(entity, component.constructor.name)
+		// return this._componentFactory.get(entity, component.constructor.name)
+		return component
+	}
+
+	assignComponents<T extends ComponentType>(entity: Entity, components: T[]) {
+		const length = components.length
+		for (let index = 0; index < length; index++) {
+			this.assignComponent(entity, components[index])
+		}
+		return components
 	}
 
 	//template <typename T>
