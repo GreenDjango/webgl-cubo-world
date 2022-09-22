@@ -38,7 +38,7 @@ export class Game {
 	private _onWindowResize: () => void
 	private renderClock: THREE.Clock
 	private tickClock: THREE.Clock
-	private tickIntervalHandle?: NodeJS.Timer
+	private tickIntervalHandle?: number
 	private renderer: THREE.WebGLRenderer
 	private scene: THREE.Scene
 	private camera: THREE.PerspectiveCamera
