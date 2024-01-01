@@ -9,16 +9,17 @@
     "serve": "parcel src/index.html --dist-dir /tmp/parcel_serve/",
     "build": "yarn -s run clean && parcel build src/index.html --no-content-hash",
     "build:prod": "yarn -s run clean && parcel build src/index.html --public-url \"/projects/cubo-world\" --no-source-maps",
-    "clean:cache": "rm -rf .parcel-cache"
-  },
-  "devDependencies": {
-    "@parcel/transformer-image": "2",
-    "@parcel/transformer-sass": "2",
-    "@types/three": "0",
-    "parcel": "2"
+    "clean:cache": "rm -rf .parcel-cache",
+    "typescript:check": "tsc --noEmit"
   },
   "dependencies": {
-    "three": "0"
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.10.3",
+    "@types/three": "^0.160.0",
+    "parcel": "^2.10.3",
+    "typescript": "^5.3.3"
   },
   "prettier": {
     "arrowParens": "always",

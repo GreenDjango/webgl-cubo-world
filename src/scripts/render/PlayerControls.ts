@@ -1,8 +1,8 @@
 import { EventDispatcher, Quaternion, Vector3, Camera } from 'three'
 
-const _changeEvent = { type: 'change' }
+const _changeEvent = { type: 'change' } as const
 
-class PlayerControls extends EventDispatcher {
+class PlayerControls extends EventDispatcher<{change: {}}> {
 	object: Camera
 	domElement: HTMLElement
 

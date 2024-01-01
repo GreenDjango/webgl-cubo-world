@@ -24,7 +24,7 @@ window.CONFIG = {
 }
 
 async function main() {
-	const loadHTML = getById('overlay-load') 
+	const loadHTML = getById('overlay-load')
 	const menuHTML = getById('overlay-menu')
 	const optionsHTML = getById('overlay-options')
 	const creditsHTML = getById('overlay-credits')
